@@ -4,10 +4,12 @@ import { createRoot } from 'react-dom/client';
 import { Content } from './Content';
 
 const Main = ({
+  orect,
   translatedText,
   originalText,
   targetLang,
 }: {
+  orect: DOMRect;
   translatedText: string;
   originalText: string;
   targetLang: string;
@@ -25,8 +27,8 @@ const Main = ({
       <div
         style={{
           position: 'absolute',
-          left: '10px', // 自由に変えて良い
-          top: '10px', // 自由に変えて良い
+          left: window.scrollX + orect.left,
+          top: window.scrollY + orect.bottom + 10,
           zIndex: 2147483550,
         }}
       >
@@ -42,17 +44,26 @@ const Main = ({
 
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
   if (message.type === 'SHOW') {
-    if (document.getElementsByTagName('my-extension-root').length > 0) {
-      document.getElementsByTagName('my-extension-root')[0].remove();
+    const selection = window.getSelection();
+    if (selection !== undefined && selection !== null && selection.toString() !== undefined) {
+      const oRange = selection.getRangeAt(0);
+      const oRect = oRange.getBoundingClientRect();
+      if (selection.toString().length === 0) {
+        return;
+      }
+      if (document.getElementsByTagName('my-extension-root').length > 0) {
+        document.getElementsByTagName('my-extension-root')[0].remove();
+      }
+      const container = document.createElement('my-extension-root');
+      document.body.after(container);
+      createRoot(container).render(
+        <Main
+          orect={oRect}
+          translatedText={message.data.translatedText.toString()}
+          originalText={message.data.originalText.toString()}
+          targetLang={message.data.lang.toString()}
+        />
+      );
     }
-    const container = document.createElement('my-extension-root');
-    document.body.after(container);
-    createRoot(container).render(
-      <Main
-        translatedText={message.data.translatedText.toString()}
-        originalText={message.data.originalText.toString()}
-        targetLang={message.data.lang.toString()}
-      />
-    );
   }
 });
