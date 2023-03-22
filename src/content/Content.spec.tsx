@@ -4,15 +4,23 @@ import { render, screen } from '@testing-library/react';
 
 import store from '../app/store';
 
-import Content from './Content';
+import { Content } from './Content';
 
 describe('content', () => {
   test('renders content example', () => {
+    const translatedText = 'test';
+    const originalText = 'テスト';
+    const targetLang = 'EN';
+
     render(
       <Provider store={store}>
-        <Content />
+        <Content
+          translatedText={translatedText}
+          originalText={originalText}
+          targetLang={targetLang}
+        />
       </Provider>
     );
-    expect(screen.getByText('Content Example')).toBeInTheDocument();
+    expect(screen.getByText('test')).toBeInTheDocument();
   });
 });
