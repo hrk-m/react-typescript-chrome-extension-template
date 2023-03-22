@@ -39,4 +39,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
+chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
+  if (message.type === 'TRANSLATE') {
+    const selectedText = message.data.selectionText ?? '';
+    const value = await bucket.get();
+    const userTargetLang = value.targetLang ?? 'EN';
+    const translatedText = await translate(selectedText, userTargetLang);
+    chrome.tabs.sendMessage(sender.tab?.id as number, {
+      type: 'SHOW',
+      data: {
+        lang: userTargetLang,
+        translatedText: translatedText,
+        originalText: selectedText,
+      },
+    });
+  }
+});
+
 export {};
