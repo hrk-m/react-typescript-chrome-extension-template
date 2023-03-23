@@ -6,9 +6,5 @@ import Popup from './Popup';
 it('should load and display Popup', async () => {
   render(<Popup />);
 
-  expect(
-    screen.getByText((content, element) => {
-      return element !== null && element.tagName.toLowerCase() === 'h1' && content === 'Popup';
-    })
-  ).toBeInTheDocument();
+  expect(screen.getByText('どの言語に翻訳しますか？')).toBeInTheDocument();
 });
